@@ -1,0 +1,7 @@
+{
+  "verbose": true,
+  "ignore": ["one", "two"],
+  "execMap": {
+    "pug": "bin/pug {{filename}} --out /tmp"
+  }
+}
