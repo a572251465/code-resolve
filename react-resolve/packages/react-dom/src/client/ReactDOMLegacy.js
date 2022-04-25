@@ -108,6 +108,7 @@ function noopOnRecoverableError() {
   // legacy API.
 }
 
+// 进行元素的挂载
 function legacyCreateRootFromDOMContainer(
   container: Container,
   initialChildren: ReactNodeList,
@@ -115,6 +116,7 @@ function legacyCreateRootFromDOMContainer(
   callback: ?Function,
   isHydrationContainer: boolean,
 ): FiberRoot {
+  // 初次进来一定是false
   if (isHydrationContainer) {
     if (typeof callback === 'function') {
       const originalCallback = callback;
@@ -161,6 +163,7 @@ function legacyCreateRootFromDOMContainer(
       };
     }
 
+    // 创建元素
     const root = createContainer(
       container,
       LegacyRoot,
@@ -180,6 +183,7 @@ function legacyCreateRootFromDOMContainer(
 
     // Initial mount should not be batched.
     flushSync(() => {
+      // 更新容器
       updateContainer(initialChildren, root, parentComponent, callback);
     });
 
@@ -202,8 +206,8 @@ function warnOnInvalidCallback(callback: mixed, callerName: string): void {
 
 function legacyRenderSubtreeIntoContainer(
   parentComponent: ?React$Component<any, any>,
-  children: ReactNodeList,
-  container: Container,
+  children: ReactNodeList, // 组件元素
+  container: Container, // 挂载节点
   forceHydrate: boolean,
   callback: ?Function,
 ) {
@@ -214,6 +218,8 @@ function legacyRenderSubtreeIntoContainer(
 
   const maybeRoot = container._reactRootContainer;
   let root: FiberRoot;
+
+  // 进行节点挂载
   if (!maybeRoot) {
     // Initial mount
     root = legacyCreateRootFromDOMContainer(
@@ -310,20 +316,14 @@ export function hydrate(
   );
 }
 
+// 表示绘制dom的 render函数
 export function render(
-  element: React$Element<any>,
-  container: Container,
+  element: React$Element<any>, // 组件
+  container: Container, // 挂载节点
   callback: ?Function,
 ) {
-  if (__DEV__) {
-    console.error(
-      'ReactDOM.render is no longer supported in React 18. Use createRoot ' +
-        'instead. Until you switch to the new API, your app will behave as ' +
-        "if it's running React 17. Learn " +
-        'more: https://reactjs.org/link/switch-to-createroot',
-    );
-  }
 
+  // 判断必须是一个有效的dom
   if (!isValidContainerLegacy(container)) {
     throw new Error('Target container is not a DOM element.');
   }
@@ -342,8 +342,8 @@ export function render(
   }
   return legacyRenderSubtreeIntoContainer(
     null,
-    element,
-    container,
+    element, // 当前组件元素
+    container, // 挂载节点
     false,
     callback,
   );

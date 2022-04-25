@@ -11,31 +11,30 @@ import {REACT_PROVIDER_TYPE, REACT_CONTEXT_TYPE} from 'shared/ReactSymbols';
 
 import type {ReactContext} from 'shared/ReactTypes';
 
+// 用来表示生成上下文
 export function createContext<T>(defaultValue: T): ReactContext<T> {
   // TODO: Second argument used to be an optional `calculateChangedBits`
   // function. Warn to reserve for future use?
 
   const context: ReactContext<T> = {
     $$typeof: REACT_CONTEXT_TYPE,
-    // As a workaround to support multiple concurrent renderers, we categorize
-    // some renderers as primary and others as secondary. We only expect
-    // there to be two concurrent renderers at most: React Native (primary) and
-    // Fabric (secondary); React DOM (primary) and React ART (secondary).
-    // Secondary renderers store their context values on separate fields.
+    // 将来要存放的值
     _currentValue: defaultValue,
     _currentValue2: defaultValue,
-    // Used to track how many concurrent renderers this context currently
-    // supports within in a single renderer. Such as parallel server rendering.
     _threadCount: 0,
     // These are circular
     Provider: (null: any),
     Consumer: (null: any),
-
-    // Add these to use same hidden class in VM as ServerContext
     _defaultValue: (null: any),
     _globalName: (null: any),
   };
 
+  // 提供的Provider组件 使用案例
+  /**
+   *
+   * const CounterContext = React.createContext()
+   * <CounterContext.Provider value = {xxx}></CounterContext.Provider>
+   */
   context.Provider = {
     $$typeof: REACT_PROVIDER_TYPE,
     _context: context,
@@ -46,14 +45,10 @@ export function createContext<T>(defaultValue: T): ReactContext<T> {
   let hasWarnedAboutDisplayNameOnConsumer = false;
 
   if (__DEV__) {
-    // A separate object, but proxies back to the original context object for
-    // backwards compatibility. It has a different $$typeof, so we can properly
-    // warn for the incorrect usage of Context as a Consumer.
     const Consumer = {
       $$typeof: REACT_CONTEXT_TYPE,
       _context: context,
     };
-    // $FlowFixMe: Flow complains about not setting a value, which is intentional here
     Object.defineProperties(Consumer, {
       Provider: {
         get() {
@@ -122,7 +117,6 @@ export function createContext<T>(defaultValue: T): ReactContext<T> {
         },
       },
     });
-    // $FlowFixMe: Flow complains about missing properties because it doesn't understand defineProperty
     context.Consumer = Consumer;
   } else {
     context.Consumer = context;

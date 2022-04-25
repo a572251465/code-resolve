@@ -1589,6 +1589,7 @@ function getCallerStackFrame(): string {
     : stackFrames.slice(2, 3).join('\n');
 }
 
+// 实现ref挂载
 function mountRef<T>(initialValue: T): {|current: T|} {
   const hook = mountWorkInProgressHook();
   if (enableUseRefAccessWarning) {
@@ -1603,8 +1604,10 @@ function mountRef<T>(initialValue: T): {|current: T|} {
       let didWarnAboutRead = false;
       let didWarnAboutWrite = false;
 
+      // 表示需要赋值的基本值
       let current = initialValue;
       const ref = {
+        // 得到基本值
         get current() {
           if (!hasBeenInitialized) {
             didCheckForLazyInit = true;
@@ -1624,8 +1627,10 @@ function mountRef<T>(initialValue: T): {|current: T|} {
               );
             }
           }
+          // 返回值
           return current;
         },
+        // 进行基本值的设定
         set current(value) {
           if (currentlyRenderingFiber !== null && !didWarnAboutWrite) {
             if (

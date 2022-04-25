@@ -243,6 +243,7 @@ function findHostInstanceWithWarning(
   return findHostInstance(component);
 }
 
+// 表示创建元素
 export function createContainer(
   containerInfo: Container,
   tag: RootTag,
@@ -317,6 +318,7 @@ export function createHydrationContainer(
   return root;
 }
 
+// 更新容器
 export function updateContainer(
   element: ReactNodeList,
   container: OpaqueRoot,
