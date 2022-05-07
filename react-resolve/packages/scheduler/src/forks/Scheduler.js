@@ -548,6 +548,8 @@ const performWorkUntilDeadline = () => {
 };
 
 let schedulePerformWorkUntilDeadline;
+
+// 如果是node || 老IE 使用该api
 if (typeof localSetImmediate === 'function') {
   // Node.js and old IE.
   // There's a few reasons for why we prefer setImmediate.

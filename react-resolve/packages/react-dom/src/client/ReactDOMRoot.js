@@ -89,48 +89,13 @@ function ReactDOMRoot(internalRoot: FiberRoot) {
   this._internalRoot = internalRoot;
 }
 
+// 表示render入口
 ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render = function(
   children: ReactNodeList,
 ): void {
   const root = this._internalRoot;
-  if (root === null) {
-    throw new Error('Cannot update an unmounted root.');
-  }
 
-  if (__DEV__) {
-    if (typeof arguments[1] === 'function') {
-      console.error(
-        'render(...): does not support the second callback argument. ' +
-          'To execute a side effect after rendering, declare it in a component body with useEffect().',
-      );
-    } else if (isValidContainer(arguments[1])) {
-      console.error(
-        'You passed a container to the second argument of root.render(...). ' +
-          "You don't need to pass it again since you already passed it to create the root.",
-      );
-    } else if (typeof arguments[1] !== 'undefined') {
-      console.error(
-        'You passed a second argument to root.render(...) but it only accepts ' +
-          'one argument.',
-      );
-    }
-
-    const container = root.containerInfo;
-
-    if (container.nodeType !== COMMENT_NODE) {
-      const hostInstance = findHostInstanceWithNoPortals(root.current);
-      if (hostInstance) {
-        if (hostInstance.parentNode !== container) {
-          console.error(
-            'render(...): It looks like the React-rendered content of the ' +
-              'root container was removed without using React. This is not ' +
-              'supported and will cause errors. Instead, call ' +
-              "root.unmount() to empty a root's container.",
-          );
-        }
-      }
-    }
-  }
+  // 表示子组件 jsx children
   updateContainer(children, root, null, null);
 };
 
@@ -163,6 +128,7 @@ ReactDOMHydrationRoot.prototype.unmount = ReactDOMRoot.prototype.unmount = funct
   }
 };
 
+// createRoot实现
 export function createRoot(
   container: Element | DocumentFragment,
   options?: CreateRootOptions,
@@ -180,27 +146,6 @@ export function createRoot(
   let transitionCallbacks = null;
 
   if (options !== null && options !== undefined) {
-    if (__DEV__) {
-      if ((options: any).hydrate) {
-        console.warn(
-          'hydrate through createRoot is deprecated. Use ReactDOMClient.hydrateRoot(container, <App />) instead.',
-        );
-      } else {
-        if (
-          typeof options === 'object' &&
-          options !== null &&
-          (options: any).$$typeof === REACT_ELEMENT_TYPE
-        ) {
-          console.error(
-            'You passed a JSX element to createRoot. You probably meant to ' +
-              'call root.render instead. ' +
-              'Example usage:\n\n' +
-              '  let root = createRoot(domContainer);\n' +
-              '  root.render(<App />);',
-          );
-        }
-      }
-    }
     if (options.unstable_strictMode === true) {
       isStrictMode = true;
     }

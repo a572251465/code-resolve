@@ -22,9 +22,10 @@ import {
   __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED as Internals,
 } from './';
 
+// 创建dom的入口
 export function createRoot(
-  container: Element | DocumentFragment,
-  options?: CreateRootOptions,
+  container,
+  options
 ): RootType {
   if (__DEV__) {
     Internals.usingClientEntryPoint = true;
