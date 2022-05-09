@@ -128,6 +128,7 @@ function createGetter(isReadonly = false, shallow = false) {
 
     // 如果不是只读， 触发依赖收集
     if (!isReadonly) {
+      // 进行依赖收集
       track(target, TrackOpTypes.GET, key)
     }
 

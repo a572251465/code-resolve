@@ -50,6 +50,9 @@ export let activeEffect: ReactiveEffect | undefined
 export const ITERATE_KEY = Symbol(__DEV__ ? 'iterate' : '')
 export const MAP_KEY_ITERATE_KEY = Symbol(__DEV__ ? 'Map key iterate' : '')
 
+/**
+ * @description 使用类构造一个effect
+ */
 export class ReactiveEffect<T = any> {
   active = true
   deps: Dep[] = []
@@ -83,10 +86,13 @@ export class ReactiveEffect<T = any> {
     recordEffectScope(this, scope)
   }
 
+  // 执行run函数
   run() {
+    // 如果effect不是active状态 只执行函数 没有设置激活的effect
     if (!this.active) {
       return this.fn()
     }
+    // 激活的effect给parent  第一个肯定是undefined
     let parent: ReactiveEffect | undefined = activeEffect
     let lastShouldTrack = shouldTrack
     while (parent) {
@@ -96,7 +102,9 @@ export class ReactiveEffect<T = any> {
       parent = parent.parent
     }
     try {
+      // 上一次effect 赋值给parent
       this.parent = activeEffect
+      // this表示当前激活的effect
       activeEffect = this
       shouldTrack = true
 
@@ -107,6 +115,7 @@ export class ReactiveEffect<T = any> {
       } else {
         cleanupEffect(this)
       }
+      // 执行函数
       return this.fn()
     } finally {
       if (effectTrackDepth <= maxMarkerBits) {
@@ -115,6 +124,7 @@ export class ReactiveEffect<T = any> {
 
       trackOpBit = 1 << --effectTrackDepth
 
+      // 将父类 赋值给effect
       activeEffect = this.parent
       shouldTrack = lastShouldTrack
       this.parent = undefined
@@ -167,20 +177,30 @@ export interface ReactiveEffectRunner<T = any> {
   effect: ReactiveEffect
 }
 
+/**
+ * @description 表示effect入口函数
+ * @param fn 执行依赖函数
+ * @param options 执行参数
+ * @returns 
+ */
 export function effect<T = any>(
   fn: () => T,
   options?: ReactiveEffectOptions
 ): ReactiveEffectRunner {
+
+  // 从effect上过度fn
   if ((fn as ReactiveEffectRunner).effect) {
     fn = (fn as ReactiveEffectRunner).effect.fn
   }
 
+  // 用类ReactiveEffect 实现effect
   const _effect = new ReactiveEffect(fn)
   if (options) {
     extend(_effect, options)
     if (options.scope) recordEffectScope(_effect, options.scope)
   }
   if (!options || !options.lazy) {
+    // 立刻执行 收集依赖
     _effect.run()
   }
   const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
@@ -210,7 +230,11 @@ export function resetTracking() {
   shouldTrack = last === undefined ? true : last
 }
 
+/**
+ * 依赖收集函数
+ */
 export function track(target: object, type: TrackOpTypes, key: unknown) {
+  // 如果当前effect 不激活 不进行处理
   if (shouldTrack && activeEffect) {
     let depsMap = targetMap.get(target)
     if (!depsMap) {
@@ -240,11 +264,12 @@ export function trackEffects(
       shouldTrack = !wasTracked(dep)
     }
   } else {
-    // Full cleanup mode.
+    // 判断dep中是否存在 effect
     shouldTrack = !dep.has(activeEffect!)
   }
 
   if (shouldTrack) {
+    // 双向记忆
     dep.add(activeEffect!)
     activeEffect!.deps.push(dep)
     if (__DEV__ && activeEffect!.onTrack) {
@@ -256,6 +281,10 @@ export function trackEffects(
   }
 }
 
+/**
+ * 
+ * 触发依赖更新
+ */
 export function trigger(
   target: object,
   type: TriggerOpTypes,
@@ -361,6 +390,9 @@ export function triggerEffects(
   }
 }
 
+/**
+ * 触发effect
+ */
 function triggerEffect(
   effect: ReactiveEffect,
   debuggerEventExtraInfo?: DebuggerEventExtraInfo
@@ -369,9 +401,12 @@ function triggerEffect(
     if (__DEV__ && effect.onTrigger) {
       effect.onTrigger(extend({ effect }, debuggerEventExtraInfo))
     }
+
+    // 如果有scheduler函数在优先执行《scheduler》 反之 执行run函数
     if (effect.scheduler) {
       effect.scheduler()
     } else {
+      // 执行effect的run函数
       effect.run()
     }
   }
