@@ -125,9 +125,10 @@ export function watch<
   options?: WatchOptions<Immediate>
 ): WatchStopHandle
 
-// overload: multiple sources w/ `as const`
-// watch([foo, bar] as const, () => {})
-// somehow [...T] breaks when the type is readonly
+/**
+ * 
+ * @description watch 执行入口 
+ */
 export function watch<
   T extends Readonly<MultiWatchSources>,
   Immediate extends Readonly<boolean> = false
@@ -170,6 +171,7 @@ export function watch<T = any, Immediate extends Readonly<boolean> = false>(
   return doWatch(source as any, cb, options)
 }
 
+// watch执行核心
 function doWatch(
   source: WatchSource | WatchSource[] | WatchEffect | object,
   cb: WatchCallback | null,
@@ -204,12 +206,16 @@ function doWatch(
   let forceTrigger = false
   let isMultiSource = false
 
+  // 如果watch中第一个值ref 可以直接使用
   if (isRef(source)) {
     getter = () => source.value
     forceTrigger = isShallow(source)
+
+    // 如果是reactive可以直接使用 可以监听 默认就是deep监听 但是不建议
   } else if (isReactive(source)) {
     getter = () => source
     deep = true
+    // 如果是数组判断
   } else if (isArray(source)) {
     isMultiSource = true
     forceTrigger = source.some(isReactive)
@@ -297,12 +303,16 @@ function doWatch(
   }
 
   let oldValue = isMultiSource ? [] : INITIAL_WATCHER_VALUE
+
+  // watch 的 scheduler  属性变化 回调该方法
   const job: SchedulerJob = () => {
+    // 判断effect是否激活
     if (!effect.active) {
       return
     }
+    // 回调函数
     if (cb) {
-      // watch(source, cb)
+      // watch(source, cb)  获取新值
       const newValue = effect.run()
       if (
         deep ||
@@ -320,6 +330,7 @@ function doWatch(
         if (cleanup) {
           cleanup()
         }
+        // 调用callback 方法
         callWithAsyncErrorHandling(cb, instance, ErrorCodes.WATCH_CALLBACK, [
           newValue,
           // pass undefined as the old value when it's changed for the first time
@@ -348,6 +359,7 @@ function doWatch(
     scheduler = () => queuePreFlushCb(job)
   }
 
+  // 执行ReactiveEffect类  getter就是执行函数
   const effect = new ReactiveEffect(getter, scheduler)
 
   if (__DEV__) {
@@ -357,9 +369,13 @@ function doWatch(
 
   // initial run
   if (cb) {
+    // 表示是否立即执行
     if (immediate) {
+
+      // 如果立即执行  调用函数job
       job()
     } else {
+      // 获取变更前的值
       oldValue = effect.run()
     }
   } else if (flush === 'post') {
@@ -421,6 +437,7 @@ export function createPathGetter(ctx: any, path: string) {
   }
 }
 
+// 深度遍历
 export function traverse(value: unknown, seen?: Set<unknown>) {
   if (!isObject(value) || (value as any)[ReactiveFlags.SKIP]) {
     return value
