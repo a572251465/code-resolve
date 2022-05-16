@@ -446,6 +446,7 @@ const emptyAppContext = createAppContext()
 
 let uid = 0
 
+// 创建component instance 实例
 export function createComponentInstance(
   vnode: VNode,
   parent: ComponentInternalInstance | null,
@@ -473,6 +474,7 @@ export function createComponentInstance(
     exposed: null,
     exposeProxy: null,
     withProxy: null,
+    // 进行provides存保存 如果父类存在 直接使用父类 不然自己创建最新的
     provides: parent ? parent.provides : Object.create(appContext.provides),
     accessCache: null!,
     renderCache: [],
@@ -587,6 +589,7 @@ export function setupComponent(
 
   const { props, children } = instance.vnode
   const isStateful = isStatefulComponent(instance)
+  // 初始化props 将vnode属性 复制给组件的props
   initProps(instance, props, isStateful, isSSR)
   initSlots(instance, children)
 

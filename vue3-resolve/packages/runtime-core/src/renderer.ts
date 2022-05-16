@@ -407,6 +407,7 @@ function baseCreateRenderer(
         )
         break
       default:
+        // 表示如果是元素 执行这个分支
         if (shapeFlag & ShapeFlags.ELEMENT) {
           processElement(
             n1,
@@ -582,6 +583,7 @@ function baseCreateRenderer(
     optimized: boolean
   ) => {
     isSVG = isSVG || (n2.type as string) === 'svg'
+    // 如果有n1 就是更新 反之就是挂载
     if (n1 == null) {
       mountElement(
         n2,
@@ -631,6 +633,7 @@ function baseCreateRenderer(
       // only do this in production since cloned trees cannot be HMR updated.
       el = vnode.el = hostCloneNode(vnode.el)
     } else {
+      // 创建元素
       el = vnode.el = hostCreateElement(
         vnode.type as string,
         isSVG,
@@ -640,6 +643,7 @@ function baseCreateRenderer(
 
       // mount children first, since some props may rely on child content
       // being already rendered, e.g. `<select value>`
+      // 表示如果文本儿子 直接挂载
       if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
         hostSetElementText(el, vnode.children as string)
       } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
@@ -1168,6 +1172,7 @@ function baseCreateRenderer(
           optimized
         )
       } else {
+        // 进行组件的挂载
         mountComponent(
           n2,
           container,
@@ -1196,6 +1201,7 @@ function baseCreateRenderer(
     // mounting
     const compatMountInstance =
       __COMPAT__ && initialVNode.isCompatRoot && initialVNode.component
+      // 获取组件的实例。 其实就是定义一个对象 对象中包含很多属性
     const instance: ComponentInternalInstance =
       compatMountInstance ||
       (initialVNode.component = createComponentInstance(
@@ -1223,6 +1229,7 @@ function baseCreateRenderer(
       if (__DEV__) {
         startMeasure(instance, `init`)
       }
+      // 函数props 设置等
       setupComponent(instance)
       if (__DEV__) {
         endMeasure(instance, `init`)
@@ -1259,6 +1266,7 @@ function baseCreateRenderer(
     }
   }
 
+  // 更新组件
   const updateComponent = (n1: VNode, n2: VNode, optimized: boolean) => {
     const instance = (n2.component = n1.component)!
     if (shouldUpdateComponent(n1, n2, optimized)) {
@@ -2315,12 +2323,14 @@ function baseCreateRenderer(
     return hostNextSibling((vnode.anchor || vnode.el)!)
   }
 
+  // 表示render 入口
   const render: RootRenderFunction = (vnode, container, isSVG) => {
     if (vnode == null) {
       if (container._vnode) {
         unmount(container._vnode, null, null, true)
       }
     } else {
+      // 执行path 进行犀新旧执行 第一个container_vnode 肯定是空的
       patch(container._vnode || null, vnode, container, null, null, null, isSVG)
     }
     flushPostFlushCbs()

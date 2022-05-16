@@ -177,29 +177,6 @@ function doWatch(
   cb: WatchCallback | null,
   { immediate, deep, flush, onTrack, onTrigger }: WatchOptions = EMPTY_OBJ
 ): WatchStopHandle {
-  if (__DEV__ && !cb) {
-    if (immediate !== undefined) {
-      warn(
-        `watch() "immediate" option is only respected when using the ` +
-          `watch(source, callback, options?) signature.`
-      )
-    }
-    if (deep !== undefined) {
-      warn(
-        `watch() "deep" option is only respected when using the ` +
-          `watch(source, callback, options?) signature.`
-      )
-    }
-  }
-
-  const warnInvalidSource = (s: unknown) => {
-    warn(
-      `Invalid watch source: `,
-      s,
-      `A watch source can only be a getter/effect function, a ref, ` +
-        `a reactive object, or an array of these types.`
-    )
-  }
 
   const instance = currentInstance
   let getter: () => any

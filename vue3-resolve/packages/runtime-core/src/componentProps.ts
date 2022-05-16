@@ -177,7 +177,7 @@ export function initProps(
   }
 
   if (isStateful) {
-    // stateful
+    // stateful props 是响应式数据 但是是浅的 shallowReactive
     instance.props = isSSR ? props : shallowReactive(props)
   } else {
     if (!instance.type.props) {
