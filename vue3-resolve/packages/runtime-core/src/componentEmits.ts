@@ -68,53 +68,29 @@ export type EmitFn<
       }[Event]
     >
 
+/**
+ *  @description emit实现入口
+ */
 export function emit(
+  // 组件实例
   instance: ComponentInternalInstance,
+  // 触发事件
   event: string,
+  // 剩余参数
   ...rawArgs: any[]
 ) {
   if (instance.isUnmounted) return
+  // 获取实例上的props
   const props = instance.vnode.props || EMPTY_OBJ
 
-  if (__DEV__) {
-    const {
-      emitsOptions,
-      propsOptions: [propsOptions]
-    } = instance
-    if (emitsOptions) {
-      if (
-        !(event in emitsOptions) &&
-        !(
-          __COMPAT__ &&
-          (event.startsWith('hook:') ||
-            event.startsWith(compatModelEventPrefix))
-        )
-      ) {
-        if (!propsOptions || !(toHandlerKey(event) in propsOptions)) {
-          warn(
-            `Component emitted event "${event}" but it is neither declared in ` +
-              `the emits option nor as an "${toHandlerKey(event)}" prop.`
-          )
-        }
-      } else {
-        const validator = emitsOptions[event]
-        if (isFunction(validator)) {
-          const isValid = validator(...rawArgs)
-          if (!isValid) {
-            warn(
-              `Invalid event arguments: event validation failed for event "${event}".`
-            )
-          }
-        }
-      }
-    }
-  }
-
   let args = rawArgs
+  // 开始是update: 是v-model的绑定事件
   const isModelListener = event.startsWith('update:')
 
   // for v-model update:xxx events, apply modifiers on args
+  // 通过slice 截取正常事件名称
   const modelArg = isModelListener && event.slice(7)
+  // 属性存在 && 属性在props中
   if (modelArg && modelArg in props) {
     const modifiersKey = `${
       modelArg === 'modelValue' ? 'model' : modelArg
@@ -131,23 +107,8 @@ export function emit(
     devtoolsComponentEmit(instance, event, args)
   }
 
-  if (__DEV__) {
-    const lowerCaseEvent = event.toLowerCase()
-    if (lowerCaseEvent !== event && props[toHandlerKey(lowerCaseEvent)]) {
-      warn(
-        `Event "${lowerCaseEvent}" is emitted in component ` +
-          `${formatComponentName(
-            instance,
-            instance.type
-          )} but the handler is registered for "${event}". ` +
-          `Note that HTML attributes are case-insensitive and you cannot use ` +
-          `v-on to listen to camelCase events when using in-DOM templates. ` +
-          `You should probably use "${hyphenate(event)}" instead of "${event}".`
-      )
-    }
-  }
-
   let handlerName
+  // 通过emit触发的事件
   let handler =
     props[(handlerName = toHandlerKey(event))] ||
     // also try camelCase event handler (#2249)
@@ -158,6 +119,7 @@ export function emit(
     handler = props[(handlerName = toHandlerKey(hyphenate(event)))]
   }
 
+  // 进行事件执行
   if (handler) {
     callWithAsyncErrorHandling(
       handler,
@@ -167,6 +129,7 @@ export function emit(
     )
   }
 
+  // 处理关于修饰符`once`的事件
   const onceHandler = props[handlerName + `Once`]
   if (onceHandler) {
     if (!instance.emitted) {

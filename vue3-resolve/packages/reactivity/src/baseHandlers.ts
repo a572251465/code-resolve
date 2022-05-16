@@ -48,6 +48,7 @@ const shallowReadonlyGet = /*#__PURE__*/ createGetter(true, true)
 
 const arrayInstrumentations = /*#__PURE__*/ createArrayInstrumentations()
 
+// 重新数组
 function createArrayInstrumentations() {
   const instrumentations: Record<string, Function> = {}
   // instrument identity-sensitive Array methods to account for possible reactive
@@ -116,6 +117,7 @@ function createGetter(isReadonly = false, shallow = false) {
 
     // 判断是否是数组
     const targetIsArray = isArray(target)
+    // 判断是否代理数组
     if (!isReadonly && targetIsArray && hasOwn(arrayInstrumentations, key)) {
       return Reflect.get(arrayInstrumentations, key, receiver)
     }

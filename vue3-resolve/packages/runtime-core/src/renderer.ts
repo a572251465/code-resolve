@@ -421,6 +421,8 @@ function baseCreateRenderer(
             optimized
           )
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
+
+          // 解析组件的分支
           processComponent(
             n1,
             n2,
