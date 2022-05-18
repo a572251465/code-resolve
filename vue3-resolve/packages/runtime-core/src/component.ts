@@ -591,6 +591,7 @@ export function setupComponent(
   const isStateful = isStatefulComponent(instance)
   // 初始化props 将vnode属性 复制给组件的props
   initProps(instance, props, isStateful, isSSR)
+  // 初始化slot
   initSlots(instance, children)
 
   const setupResult = isStateful

@@ -84,10 +84,12 @@ const normalizeObjectSlots = (
   instance: ComponentInternalInstance
 ) => {
   const ctx = rawSlots._ctx
+  // 遍历每个slot
   for (const key in rawSlots) {
     if (isInternalKey(key)) continue
     const value = rawSlots[key]
     if (isFunction(value)) {
+      // 直接给slot赋值
       slots[key] = normalizeSlot(key, value, ctx)
     } else if (value != null) {
       if (
@@ -126,10 +128,12 @@ const normalizeVNodeSlots = (
   instance.slots.default = () => normalized
 }
 
+// 进行slot初始化
 export const initSlots = (
   instance: ComponentInternalInstance,
   children: VNodeNormalizedChildren
 ) => {
+  // 如果slot是一个数组的话 说明存在多个slot
   if (instance.vnode.shapeFlag & ShapeFlags.SLOTS_CHILDREN) {
     const type = (children as RawSlots)._
     if (type) {
@@ -139,6 +143,7 @@ export const initSlots = (
       // make compiler marker non-enumerable
       def(children as InternalSlots, '_', type)
     } else {
+      // 进行多个slot实例化
       normalizeObjectSlots(
         children as RawSlots,
         (instance.slots = {}),
@@ -146,6 +151,7 @@ export const initSlots = (
       )
     }
   } else {
+    // 如果只有一个slot的话 说明只有默认的default slot
     instance.slots = {}
     if (children) {
       normalizeVNodeSlots(instance, children)
