@@ -19,6 +19,7 @@ import { queuePostRenderEffect } from './renderer'
 
 /**
  * Function for handling a template ref
+ *  设置属性 ref
  */
 export function setRef(
   rawRef: VNodeNormalizedRef,
@@ -27,6 +28,7 @@ export function setRef(
   vnode: VNode,
   isUnmount = false
 ) {
+  // 判断rawRef属性 是否是数组
   if (isArray(rawRef)) {
     rawRef.forEach((r, i) =>
       setRef(
@@ -46,6 +48,7 @@ export function setRef(
     return
   }
 
+  // 如果是组件 就是组件实例 反之就是dom
   const refValue =
     vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT
       ? getExposeProxy(vnode.component!) || vnode.component!.proxy
@@ -103,6 +106,7 @@ export function setRef(
             }
           }
         } else if (_isString) {
+          // 直接赋值  最有价值的一句话
           refs[ref] = value
           if (hasOwn(setupState, ref)) {
             setupState[ref] = value
