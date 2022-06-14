@@ -1,13 +1,8 @@
 /* eslint-disable no-console */
 import React from 'react';
-import Notification from 'rc-notification';
 import '../../assets/index.less';
-import { NotificationInstance } from 'rc-notification/Notification';
-
-let notificationInstance: NotificationInstance = null;
-Notification.newInstance({}, n => {
-  notificationInstance = n;
-});
+import { useNotification } from '../../src';
+import motion from './motion';
 
 const Context = React.createContext({ name: 'light' });
 
@@ -20,22 +15,20 @@ const NOTICE = {
 };
 
 const Demo = () => {
-  const [notice, holder] = notificationInstance.useNotification();
+  const [{ open }, holder] = useNotification({ motion });
 
   return (
     <Context.Provider value={{ name: 'bamboo' }}>
       <button
         type="button"
         onClick={() => {
-          notificationInstance.notice({ ...NOTICE });
-          notice({
+          open({
             ...NOTICE,
             content: <Context.Consumer>{({ name }) => `Hi ${name}!`}</Context.Consumer>,
             props: {
               'data-testid': 'my-data-testid',
             },
           });
-          notificationInstance.notice({ ...NOTICE });
         }}
       >
         simple show
