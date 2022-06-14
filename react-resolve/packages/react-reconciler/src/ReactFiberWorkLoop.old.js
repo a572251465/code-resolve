@@ -628,6 +628,7 @@ export function scheduleUpdateOnFiber(
       }
     }
 
+    // 确认root 节点
     ensureRootIsScheduled(root, eventTime);
     if (
       lane === SyncLane &&
@@ -855,6 +856,7 @@ function ensureRootIsScheduled(root: FiberRoot, currentTime: number) {
         schedulerPriorityLevel = NormalSchedulerPriority;
         break;
     }
+    // 确认回调事件
     newCallbackNode = scheduleCallback(
       schedulerPriorityLevel,
       performConcurrentWorkOnRoot.bind(null, root),

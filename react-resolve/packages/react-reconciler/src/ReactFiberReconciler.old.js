@@ -378,6 +378,7 @@ export function updateContainer(
   }
 
   enqueueUpdate(current, update, lane);
+  // 进度更新Fiber
   const root = scheduleUpdateOnFiber(current, lane, eventTime);
   if (root !== null) {
     entangleTransitions(root, current, lane);

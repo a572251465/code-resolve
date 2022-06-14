@@ -512,6 +512,7 @@ function forceFrameRate(fps) {
   }
 }
 
+// 此方法是通過MessageChannel 進行執行
 const performWorkUntilDeadline = () => {
   if (scheduledHostCallback !== null) {
     const currentTime = getCurrentTime();
