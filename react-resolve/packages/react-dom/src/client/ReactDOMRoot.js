@@ -178,10 +178,12 @@ export function createRoot(
   );
   markContainerAsRoot(root.current, container);
 
+  // 获取root 节点
   const rootContainerElement: Document | Element | DocumentFragment =
     container.nodeType === COMMENT_NODE
       ? (container.parentNode: any)
       : container;
+  // 监听所有的支持的事件
   listenToAllSupportedEvents(rootContainerElement);
 
   return new ReactDOMRoot(root);

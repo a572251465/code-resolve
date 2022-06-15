@@ -89,6 +89,7 @@ export function createEventListenerWrapperWithPriority(
   let listenerWrapper;
   switch (eventPriority) {
     case DiscreteEventPriority:
+      // click 执行此事件
       listenerWrapper = dispatchDiscreteEvent;
       break;
     case ContinuousEventPriority:

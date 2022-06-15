@@ -86,6 +86,8 @@ type DispatchEntry = {|
 export type DispatchQueue = Array<DispatchEntry>;
 
 // TODO: remove top-level side effect.
+// 表示注冊事件的入口
+// 此处为注册的简单事件
 SimpleEventPlugin.registerEvents();
 EnterLeaveEventPlugin.registerEvents();
 ChangeEventPlugin.registerEvents();
@@ -342,6 +344,7 @@ export function listenToNativeEvent(
   if (isCapturePhaseListener) {
     eventSystemFlags |= IS_CAPTURE_PHASE;
   }
+  // 添加事件监听
   addTrappedEventListener(
     target,
     domEventName,
@@ -383,16 +386,22 @@ const listeningMarker =
     .toString(36)
     .slice(2);
 
+// 表示支持所有的事件类型
 export function listenToAllSupportedEvents(rootContainerElement: EventTarget) {
+  // 表示节点上 是否绑定过事件
   if (!(rootContainerElement: any)[listeningMarker]) {
+    // 设置已经绑定过了
     (rootContainerElement: any)[listeningMarker] = true;
     allNativeEvents.forEach(domEventName => {
       // We handle selectionchange separately because it
       // doesn't bubble and needs to be on the document.
       if (domEventName !== 'selectionchange') {
+        // 如果不是指定的事件
         if (!nonDelegatedEvents.has(domEventName)) {
+          // 冒泡事件
           listenToNativeEvent(domEventName, false, rootContainerElement);
         }
+        // 捕获事件
         listenToNativeEvent(domEventName, true, rootContainerElement);
       }
     });
