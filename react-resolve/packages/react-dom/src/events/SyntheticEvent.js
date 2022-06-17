@@ -66,6 +66,7 @@ function createSyntheticEvent(Interface: EventInterfaceType) {
       }
     }
 
+    // 设置事件冒泡 以及默认事件
     const defaultPrevented =
       nativeEvent.defaultPrevented != null
         ? nativeEvent.defaultPrevented
@@ -79,6 +80,7 @@ function createSyntheticEvent(Interface: EventInterfaceType) {
     return this;
   }
 
+  // 这个主要是冒泡以及默认事件 兼容性处理
   assign(SyntheticBaseEvent.prototype, {
     preventDefault: function() {
       this.defaultPrevented = true;
@@ -180,6 +182,7 @@ function updateMouseMovementPolyfillState(event) {
  * @interface MouseEvent
  * @see http://www.w3.org/TR/DOM-Level-3-Events/
  */
+// 表示默认合成事件属性
 const MouseEventInterface: EventInterfaceType = {
   ...UIEventInterface,
   screenX: 0,

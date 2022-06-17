@@ -94,6 +94,7 @@ ChangeEventPlugin.registerEvents();
 SelectEventPlugin.registerEvents();
 BeforeInputEventPlugin.registerEvents();
 
+// 抽离执行的事件
 function extractEvents(
   dispatchQueue: DispatchQueue,
   domEventName: DOMEventName,
@@ -109,6 +110,7 @@ function extractEvents(
   // should probably be inlined somewhere and have its logic
   // be core the to event system. This would potentially allow
   // us to ship builds of React without the polyfilled plugins below.
+  // --- 重中之重
   SimpleEventPlugin.extractEvents(
     dispatchQueue,
     domEventName,
@@ -642,6 +644,7 @@ export function dispatchEventForPluginEventSystem(
     }
   }
 
+  // 并发处理 包括派发事件的更新处理
   batchedUpdates(() =>
     dispatchEventsForPlugins(
       domEventName,
@@ -711,6 +714,7 @@ export function accumulateSinglePhaseListeners(
       }
 
       // Standard React on* listeners, i.e. onClick or onClickCapture
+      // 收集事件 核心核心
       if (reactEventName !== null) {
         const listener = getListener(instance, reactEventName);
         if (listener != null) {

@@ -108,6 +108,7 @@ export function createEventListenerWrapperWithPriority(
   );
 }
 
+// 用户点击页面的click事件 执行此函数
 function dispatchDiscreteEvent(
   domEventName,
   eventSystemFlags,
@@ -157,6 +158,7 @@ function dispatchEvent(
     nativeEvent,
   );
   if (blockedOn === null) {
+    // 此处标记下 click事件 执行此处
     dispatchEventForPluginEventSystem(
       domEventName,
       eventSystemFlags,
@@ -234,6 +236,7 @@ let return_targetInst = null;
 
 // Returns a SuspenseInstance or Container if it's blocked.
 // The return_targetInst field above is conceptually part of the return value.
+// 此方法主要的作用就是寻找DOM中对应的fiber
 export function findInstanceBlockingEvent(
   domEventName: DOMEventName,
   eventSystemFlags: EventSystemFlags,
@@ -245,6 +248,7 @@ export function findInstanceBlockingEvent(
   return_targetInst = null;
 
   const nativeEventTarget = getEventTarget(nativeEvent);
+  // 查找对应的fiber
   let targetInst = getClosestInstanceFromNode(nativeEventTarget);
 
   if (targetInst !== null) {
