@@ -365,6 +365,7 @@ function areHookInputsEqual(
   return true;
 }
 
+// 执行hooks
 export function renderWithHooks<Props, SecondArg>(
   current: Fiber | null,
   workInProgress: Fiber,
@@ -407,6 +408,7 @@ export function renderWithHooks<Props, SecondArg>(
   // so memoizedState would be null during updates and mounts.
   if (__DEV__) {
     if (current !== null && current.memoizedState !== null) {
+      // 表示更新hook
       ReactCurrentDispatcher.current = HooksDispatcherOnUpdateInDEV;
     } else if (hookTypesDev !== null) {
       // This dispatcher handles an edge case where a component is updating,
@@ -416,6 +418,7 @@ export function renderWithHooks<Props, SecondArg>(
       // This dispatcher does that.
       ReactCurrentDispatcher.current = HooksDispatcherOnMountWithHookTypesInDEV;
     } else {
+      // 表示挂载hook
       ReactCurrentDispatcher.current = HooksDispatcherOnMountInDEV;
     }
   } else {
@@ -2157,6 +2160,7 @@ function refreshCache<T>(fiber: Fiber, seedKey: ?() => T, seedValue: T) {
   // TODO: Warn if unmounted?
 }
 
+// 此方法是dispatch reducer
 function dispatchReducerAction<S, A>(
   fiber: Fiber,
   queue: UpdateQueue<S, A>,
@@ -2534,6 +2538,7 @@ if (__DEV__) {
     );
   };
 
+  // 执行挂载时期的钩子对象
   HooksDispatcherOnMountInDEV = {
     readContext<T>(context: ReactContext<T>): T {
       return readContext(context);
@@ -2598,6 +2603,8 @@ if (__DEV__) {
         ReactCurrentDispatcher.current = prevDispatcher;
       }
     },
+
+    // 初期useReducer实现原理
     useReducer<S, I, A>(
       reducer: (S, A) => S,
       initialArg: I,
