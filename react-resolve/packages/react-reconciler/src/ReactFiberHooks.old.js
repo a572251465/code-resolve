@@ -651,6 +651,7 @@ function mountWorkInProgressHook(): Hook {
   return workInProgressHook;
 }
 
+// TODO 更新时获取的hook 此方法限制hook 的顺序为什么是一定的
 function updateWorkInProgressHook(): Hook {
   // This function is used both for updates and for re-renders triggered by a
   // render phase update. It assumes there is either a current hook we can
@@ -754,6 +755,7 @@ function mountReducer<S, I, A>(
   return [hook.memoizedState, dispatch];
 }
 
+// 更新的reducer执行的逻辑
 function updateReducer<S, I, A>(
   reducer: (S, A) => S,
   initialArg: I,
@@ -864,6 +866,7 @@ function updateReducer<S, I, A>(
           newState = reducer(newState, action);
         }
       }
+      // 循环读取 update next 一直更新
       update = update.next;
     } while (update !== null && update !== first);
 
@@ -2889,6 +2892,8 @@ if (__DEV__) {
         ReactCurrentDispatcher.current = prevDispatcher;
       }
     },
+
+    // 更新使用的reducer
     useReducer<S, I, A>(
       reducer: (S, A) => S,
       initialArg: I,

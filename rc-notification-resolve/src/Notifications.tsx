@@ -47,9 +47,11 @@ const Notifications = React.forwardRef<NotificationsRef, NotificationsProps>((pr
   const [configList, setConfigList] = React.useState<OpenConfig[]>([]);
 
   // ======================== Close =========================
+  // 表示关闭弹框
   const onNoticeClose = (key: React.Key) => {
     // Trigger close event
     const config = configList.find((item) => item.key === key);
+    // 执行关闭的回调函数
     config?.onClose?.();
 
     setConfigList((list) => list.filter((item) => item.key !== key));

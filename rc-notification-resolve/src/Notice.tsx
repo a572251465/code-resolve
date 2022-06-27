@@ -49,6 +49,7 @@ const Notify = React.forwardRef<HTMLDivElement, NoticeProps>((props, ref) => {
   };
 
   // ======================== Effect ========================
+  // 表示关闭定时器
   React.useEffect(() => {
     if (!hovering && duration > 0) {
       const timeout = setTimeout(() => {

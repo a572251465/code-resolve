@@ -67,13 +67,17 @@ function mergeConfig<T>(...objList: Partial<T>[]): T {
   return clone;
 }
 
+// 表示入口函数
 export default function useNotification(
   rootConfig: NotificationConfig = {},
 ): [NotificationAPI, React.ReactElement] {
   const {
+    // 表示要挂载的容器节点
     getContainer = defaultGetContainer,
     motion,
+    // 表示组件共同前缀
     prefixCls,
+    // 存在最大的个数
     maxCount,
     className,
     style,
@@ -82,7 +86,10 @@ export default function useNotification(
   } = rootConfig;
 
   const [container, setContainer] = React.useState<HTMLElement>();
+  // 表示组件实例 方便使用实例来调用open close destroy
   const notificationsRef = React.useRef<NotificationsRef>();
+
+  // 表示需要渲染的组件
   const contextHolder = (
     <Notifications
       container={container}
@@ -96,18 +103,22 @@ export default function useNotification(
     />
   );
 
+  // 多个消息弹框的 队列
   const [taskQueue, setTaskQueue] = React.useState<Task[]>([]);
 
   // ========================= Refs =========================
+  // 使用React.useMemo 进行缓存
   const api = React.useMemo<NotificationAPI>(() => {
     return {
       open: (config) => {
         const mergedConfig = mergeConfig(shareConfig, config);
+        // 设置key 一般都是用来删除的
         if (mergedConfig.key === null || mergedConfig.key === undefined) {
           mergedConfig.key = `rc-notification-${uniqueKey}`;
           uniqueKey += 1;
         }
 
+        // 就是将所有的任务 都加入队列中 之后循环依次执行队列中的任务
         setTaskQueue((queue) => [...queue, { type: 'open', config: mergedConfig }]);
       },
       close: (key) => {
@@ -123,10 +134,12 @@ export default function useNotification(
   // React 18 should all in effect that we will check container in each render
   // Which means getContainer should be stable.
   React.useEffect(() => {
+    // 设置最新的dom节点
     setContainer(getContainer());
   });
 
   // ======================== Effect ========================
+  // 监听队列 开始执行任务
   React.useEffect(() => {
     // Flush task when node ready
     if (notificationsRef.current && taskQueue.length) {
