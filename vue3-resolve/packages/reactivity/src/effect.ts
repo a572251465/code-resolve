@@ -165,8 +165,8 @@ export interface DebuggerOptions {
 }
 
 export interface ReactiveEffectOptions extends DebuggerOptions {
-  lazy?: boolean
-  scheduler?: EffectScheduler
+  lazy?: boolean // 惰性的effect
+  scheduler?: EffectScheduler // 自定义的调度器
   scope?: EffectScope
   allowRecurse?: boolean
   onStop?: () => void
