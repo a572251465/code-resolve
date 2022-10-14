@@ -31,6 +31,7 @@ declare module '@vue/reactivity' {
   }
 }
 
+// 提供操作平台的API
 const rendererOptions = /*#__PURE__*/ extend({ patchProp }, nodeOps)
 
 // lazy create the renderer - this makes core renderer logic tree-shakable
@@ -39,6 +40,7 @@ let renderer: Renderer<Element | ShadowRoot> | HydrationRenderer
 
 let enabledHydration = false
 
+// 生成渲染器的方法
 function ensureRenderer() {
   return (
     renderer ||
@@ -63,7 +65,9 @@ export const hydrate = ((...args) => {
   ensureHydrationRenderer().hydrate(...args)
 }) as RootHydrateFunction
 
+// 表示组件渲染的入口
 export const createApp = ((...args) => {
+  // 生成渲染器
   const app = ensureRenderer().createApp(...args)
 
   if (__DEV__) {
@@ -72,7 +76,10 @@ export const createApp = ((...args) => {
   }
 
   const { mount } = app
+  // 重写mount方法
   app.mount = (containerOrSelector: Element | ShadowRoot | string): any => {
+
+    // 从string 字符串 转换到真是dom
     const container = normalizeContainer(containerOrSelector)
     if (!container) return
 
@@ -101,8 +108,11 @@ export const createApp = ((...args) => {
     // clear content before mounting
     container.innerHTML = ''
     const proxy = mount(container, false, container instanceof SVGElement)
+    // 表示已经渲染过
     if (container instanceof Element) {
       container.removeAttribute('v-cloak')
+
+      // 用来标志已经渲染过了
       container.setAttribute('data-v-app', '')
     }
     return proxy
