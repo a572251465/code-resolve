@@ -62,15 +62,26 @@ export function removeEventListener(
   el.removeEventListener(event, handler, options)
 }
 
+// 用来对比event 事件
 export function patchEvent(
   el: Element & { _vei?: Record<string, Invoker | undefined> },
-  rawName: string,
+  rawName: string, // onClick onMousemove onMousedown
   prevValue: EventValue | null,
   nextValue: EventValue | null,
   instance: ComponentInternalInstance | null = null
 ) {
   // vei = vue event invokers
+  // 表示dom 上的事件缓存对象
   const invokers = el._vei || (el._vei = {})
+
+  // 获取事件上所有的函数
+  /**
+   * <div onclick = "test" onclick = "test1" onclick = "test2"></div>
+   * {
+   *   onclick: [testFn, test1Fn, test2Fn]
+   * }
+   *
+   */
   const existingInvoker = invokers[rawName]
   if (nextValue && existingInvoker) {
     // patch
@@ -78,11 +89,11 @@ export function patchEvent(
   } else {
     const [name, options] = parseName(rawName)
     if (nextValue) {
-      // add
+      // 添加事件
       const invoker = (invokers[rawName] = createInvoker(nextValue, instance))
       addEventListener(el, name, invoker, options)
     } else if (existingInvoker) {
-      // remove
+      // 表示删除事件
       removeEventListener(el, name, existingInvoker, options)
       invokers[rawName] = undefined
     }
@@ -104,10 +115,13 @@ function parseName(name: string): [string, EventListenerOptions | undefined] {
   return [hyphenate(name.slice(2)), options]
 }
 
+// 创建Invoker 函数
 function createInvoker(
-  initialValue: EventValue,
+  initialValue: EventValue, // 一般都是传递的函数
   instance: ComponentInternalInstance | null
 ) {
+
+  // 这个事件其实就是addEventListener 添加事件
   const invoker: Invoker = (e: Event) => {
     // async edge case #6566: inner click event triggers patch, event handler
     // attached to outer element during patch, and triggered again. This

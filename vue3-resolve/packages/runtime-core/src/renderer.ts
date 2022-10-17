@@ -610,6 +610,7 @@ function baseCreateRenderer(
     }
   }
 
+  // 表示挂载元素的节点
   const mountElement = (
     vnode: VNode,
     container: RendererElement,
@@ -667,6 +668,8 @@ function baseCreateRenderer(
       // props
       if (props) {
         for (const key in props) {
+
+          // 设置元素的属性
           if (key !== 'value' && !isReservedProp(key)) {
             hostPatchProp(
               el,

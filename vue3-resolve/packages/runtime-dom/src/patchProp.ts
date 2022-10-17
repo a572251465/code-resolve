@@ -21,10 +21,16 @@ export const patchProp: DOMRendererOptions['patchProp'] = (
   parentSuspense,
   unmountChildren
 ) => {
+
+  // 如果是class 处理
   if (key === 'class') {
     patchClass(el, nextValue, isSVG)
+
+    // 如果是style 处理
   } else if (key === 'style') {
     patchStyle(el, prevValue, nextValue)
+
+    // 以on开头进行事件处理
   } else if (isOn(key)) {
     // ignore v-model listeners
     if (!isModelListener(key)) {
